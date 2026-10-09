@@ -23,3 +23,13 @@ python main.py --demo                   # ข้อมูลจำลองเ�
 ```
 ปรับเกณฑ์ได้ใน `Params` (screener.py) ปรับรายชื่อหุ้นใน `tickers.py`
 ข้อมูลจาก Yahoo Finance (suffix `.BK`) อาจล่าช้า/คลาดเคลื่อนได้ — ไม่ใช่คำแนะนำการลงทุน
+
+## แจ้งเตือนผ่าน LINE
+ใช้ LINE Messaging API (LINE Notify ปิดบริการแล้ว) สร้างช่อง Messaging API ที่ LINE Developers Console แล้วออก channel access token
+```bash
+export LINE_CHANNEL_ACCESS_TOKEN=xxxx
+export LINE_TO=Uxxxxxxxx      # userId หรือ groupId; ไม่ตั้ง = broadcast ให้ผู้ติดตามบอททุกคน
+python main.py --line          # สแกนแล้วส่งผล
+python main.py --demo --line-dry-run   # ดูข้อความโดยไม่ส่ง
+```
+ตั้งเวลารันอัตโนมัติด้วย cron เช่น `30 17 * * 1-5 cd /path/thai_uptrend && python main.py --line` (หลังตลาดปิด)

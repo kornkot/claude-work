@@ -29,6 +29,8 @@ def main(argv=None) -> int:
     ap.add_argument("--out", help="บันทึกผลเป็น CSV")
     ap.add_argument("--min-value", type=float, default=Params.min_value_mb, help="มูลค่าซื้อขายเฉลี่ยขั้นต่ำ (ล้านบาท)")
     ap.add_argument("--min-adx", type=float, default=Params.min_adx)
+    ap.add_argument("--line", action="store_true", help="ส่งผลผ่าน LINE (ตั้ง LINE_CHANNEL_ACCESS_TOKEN, LINE_TO)")
+    ap.add_argument("--line-dry-run", action="store_true", help="แสดงข้อความ LINE โดยไม่ส่งจริง")
     ap.add_argument("--no-rs", action="store_true", help="ไม่เทียบกับดัชนี SET")
     a = ap.parse_args(argv)
 
@@ -72,6 +74,18 @@ def main(argv=None) -> int:
     if a.out:
         res.to_csv(a.out, index=False, encoding="utf-8-sig")
         print(f"\nบันทึกแล้ว: {a.out}")
+    if a.line or a.line_dry_run:
+        import notify
+        msg = notify.format_message(res, a.top)
+        if a.line_dry_run:
+            print("\n--- LINE (dry run) ---\n" + msg)
+        else:
+            try:
+                notify.send_line(msg)
+                print("\nส่ง LINE แล้ว")
+            except RuntimeError as e:
+                print(f"[error] ส่ง LINE ไม่สำเร็จ: {e}", file=sys.stderr)
+                return 2
     print("\n* ผลนี้เป็นเครื่องมือคัดกรองทางเทคนิค ไม่ใช่คำแนะนำการลงทุน")
     return 0
 
